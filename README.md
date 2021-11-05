@@ -10,9 +10,9 @@ python implementations of iTEBD for classical square lattice Ising models.
   * local tensor is defined as T_0 in H. Li and L.-P. Yang, Phys. Rev. B 104, 024118 (2021). T_0 is 4-leg tensor with dimension (4,4,4,4).
   * iTEBD_J1J2_Ising.py
     * Assuming 1-site iMPS. It is not suitable for the stripe phase.
-  * iTEBD_J1J2_large_Ising.py
+  * iTEBD_J1J2_Ising_large.py
     * Assuming 1-site iMPS and the local tensor is the 2x2 unit of T_0. This can simulate the stripe phase with mx order.
-  * iTEBD_J1J2_2site_Ising.py
+  * iTEBD_J1J2_Ising_2site.py
     * Assuming 2-site iMPS with the local tensor T_0. This can simulate the stripe phase with both of mx and my orders.
 
 # Usage
