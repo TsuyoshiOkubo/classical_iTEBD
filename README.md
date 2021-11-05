@@ -20,3 +20,12 @@ We need numpy and scipy. Input parameters for each application will be shown, e.
 
 ``` python3 iTEBD_Ising.py -h  ```
 
+The output contains, 
+
+* free energy density
+* energy density
+* uniform magnetization
+* stripe magnetization (mx)
+* stripe magnetization (my)
+
+(The definition of mx and my are in PRB 104, 024118 (2021).)
