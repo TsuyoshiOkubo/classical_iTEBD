@@ -14,6 +14,9 @@ python implementations of iTEBD for classical square lattice Ising models.
     * Assuming 1-site iMPS and the local tensor is the 2x2 unit of T_0. This can simulate the stripe phase with mx order.
   * iTEBD_J1J2_Ising_2site.py
     * Assuming 2-site iMPS with the local tensor T_0. This can simulate the stripe phase with both of mx and my orders.
+* Square lattice fully packed loop model
+  * iTEBD_loop.py
+    * iTEBD with 1-site iMPS. 
 
 # Usage
 We need numpy and scipy. Input parameters for each application will be shown, e.g., 
