@@ -716,30 +716,78 @@ def Calc_2site_2layer(Tn1_U,Tn2_U,Tn1_D,Tn2_D,lam1_U,lam2_U,lam1_D,lam2_D,local_
     return np.tensordot(v,vec_R,([0,1,2,3],[0,1,2,3]))
     
 def Calc_correlation_length(Tn_U,Tn_D,lam_U,lam_D,l_num):
-    ## We assume uniforma iMPS
-    ## Calculate correltion lenght from left and right eigen values
+    ## We assume uniform iMPS.
+    ## Calculate correltion length from left and right eigen values
 
-    chi = Tn_U.shape[0]
+    chi_U = Tn_U.shape[0]
+    chi_D = Tn_D.shape[0]
     lam_U_sq = np.sqrt(lam_U)
     lam_D_sq = np.sqrt(lam_D)
     Tn_U_mod = np.tensordot(np.tensordot(np.diag(lam_U_sq),Tn_U,(1,0)),np.diag(lam_U_sq),(2,0))
     Tn_D_mod = np.tensordot(np.tensordot(np.diag(lam_D_sq),Tn_D,(1,0)),np.diag(lam_D_sq),(2,0))
 
-    if chi**2 > l_num+1:    
+    if chi_U*chi_D > l_num+1:    
         def vL(v):
-            v_new = np.tensordot(np.tensordot(v.reshape(chi,chi),Tn_U_mod,(0,0)),Tn_D_mod,([0,1],[0,1]))
-            return v_new.reshape(chi**2)
+            v_new = np.tensordot(np.tensordot(v.reshape(chi_U,chi_D),Tn_U_mod,(0,0)),Tn_D_mod,([0,1],[0,1]))
+            return v_new.reshape(chi_U*chi_D)
         
-        T_mat = spr_linalg.LinearOperator((chi**2,chi**2),matvec=vL)
+        T_mat = spr_linalg.LinearOperator((chi_U*chi_D,chi_U*chi_D),matvec=vL)
 
         eig_val_L,eig_vec = spr_linalg.eigs(T_mat, k=l_num + 1)
 
-    elif chi != 1:
+    else:
         ## full diagonailzation
-        T_mat = np.tensordot(Tn_U_mod,Tn_D_mod,(1,1)).transpose(0,2,1,3).reshape(chi**2,chi**2)
+        T_mat = np.tensordot(Tn_U_mod,Tn_D_mod,(1,1)).transpose(0,2,1,3).reshape(chi_U*chi_D,chi_U*chi_D)
         eig_val_L = linalg.eigvals(T_mat)
 
         ## ordering
         eig_val_L = eig_val_L[np.argsort(np.abs(eig_val_L))[::-1]]
 
-    return -1/np.log(np.abs(eig_val_L[1:]/eig_val_L[0]))
+    if len(eig_val_L) > 1:
+        return -1/np.log(np.abs(eig_val_L[1:]/eig_val_L[0]))
+    else:
+        return np.array((0,))
+
+
+def Calc_correlation_length_2site(Tn1_U,Tn2_U,Tn1_D,Tn2_D,lam1_U,lam2_U,lam1_D,lam2_D,l_num):
+    ## We assume iMPS with 2-site unit cell.
+    ## Calculate correltion length from eigen values
+
+    chi_U = Tn1_U.shape[0]
+    chi_D = Tn1_D.shape[0]
+    
+    lam1_U_sq = np.sqrt(lam1_U)
+    lam1_D_sq = np.sqrt(lam1_D)
+    lam2_U_sq = np.sqrt(lam2_U)
+    lam2_D_sq = np.sqrt(lam2_D)
+
+    Tn1_U_mod = np.tensordot(np.tensordot(np.diag(lam2_U_sq),Tn1_U,(1,0)),np.diag(lam1_U),(2,0))
+    Tn2_U_mod = np.tensordot(Tn2_U,np.diag(lam2_U_sq),(2,0))
+    Tn1_D_mod = np.tensordot(np.tensordot(np.diag(lam2_D_sq),Tn1_D,(1,0)),np.diag(lam1_D),(2,0))
+    Tn2_D_mod = np.tensordot(Tn2_D,np.diag(lam2_D_sq),(2,0))
+
+    if chi_U*chi_D > l_num+1:    
+        def vL(v):
+            v_new = np.tensordot(np.tensordot(v.reshape(chi_U,chi_D),Tn1_U_mod,(0,0)),Tn1_D_mod,([0,1],[0,1]))
+            v_new = np.tensordot(np.tensordot(v_new,Tn2_U_mod,(0,0)),Tn2_D_mod,([0,1],[0,1]))
+            return v_new.reshape(chi_U*chi_D)
+        
+        T_mat = spr_linalg.LinearOperator((chi_U*chi_D,chi_U*chi_D),matvec=vL)
+
+        eig_val_L,eig_vec = spr_linalg.eigs(T_mat, k=l_num + 1)
+
+    else:
+        ## full diagonailzation
+        T1_mat = np.tensordot(Tn1_U_mod,Tn1_D_mod,(1,1)).transpose(0,2,1,3).reshape(chi_U*chi_D,-1)
+        T2_mat = np.tensordot(Tn2_U_mod,Tn2_D_mod,(1,1)).transpose(0,2,1,3).reshape(-1,chi_U*chi_D)
+        T_mat = np.dot(T1_mat,T2_mat)
+        eig_val_L = linalg.eigvals(T_mat)
+
+        ## ordering
+        eig_val_L = eig_val_L[np.argsort(np.abs(eig_val_L))[::-1]]
+
+    if len(eig_val_L) > 1:
+        return -1/np.log(np.abs(eig_val_L[1:]/eig_val_L[0]))
+    else:
+        return np.array((0,))
+    

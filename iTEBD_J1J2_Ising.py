@@ -148,6 +148,7 @@ def main():
     file_output.write("# lam_epsilon = "+repr(lam_epsilon)+"\n")
     file_output.write("# seed = "+repr(seed)+"\n")
     file_output.write("# append_flag = "+repr(append_flag)+"\n")
+    file_output.write("## T, f=F/N, m=M/N,   mx=Mx/N,  my=My/N, iteration number, correlation length (along J2 direction)"+"\n")
 
                         
         
@@ -189,7 +190,13 @@ def main():
 
     print("## calculation has finised at "+repr(itr-1)+" steps")
     print(repr(T)+" "  +repr(J2)+ " " +repr(-0.5*T*np.log(np.real(eig_L[0] * factor)))+ " " +repr(np.real(ene))+" " +repr(np.real(m))+" " +repr(np.real(mx))+" " +repr(np.real(my))+" "+repr(itr))
-    file_output.write(repr(T)+" "  +repr(J2)+ " " +repr(-0.5*T*np.log(np.real(eig_L[0] * factor)))+ " " +repr(np.real(ene))+" " +repr(np.real(m))+" " +repr(np.real(mx))+" " +repr(np.real(my))+" "+repr(itr)+"\n")
+
+    print("## calculate correlation length (along J2 direction)")
+    ## calculate correlation length
+    xi = Calc_correlation_length(Tn,Tn_D,lam,lam,1)
+    print(repr(T)+" "+ repr(xi[0]*np.sqrt(2)))
+    
+    file_output.write(repr(T)+" "  +repr(J2)+ " " +repr(-0.5*T*np.log(np.real(eig_L[0] * factor)))+ " " +repr(np.real(ene))+" " +repr(np.real(m))+" " +repr(np.real(mx))+" " +repr(np.real(my))+" "+repr(itr)+" " + repr(xi[0]*np.sqrt(2))+ "\n")
                         
 if __name__ == "__main__":
     main()
