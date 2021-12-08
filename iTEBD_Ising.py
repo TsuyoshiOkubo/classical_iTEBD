@@ -132,7 +132,7 @@ def main():
     file_output.write("# lam_epsilon = "+repr(lam_epsilon)+"\n")
     file_output.write("# seed = "+repr(seed)+"\n")
     file_output.write("# append_flag = "+repr(append_flag)+"\n")
-    file_output.write("## T, f=F/N, m=M/N,  f_exact, m_exact, iteration number, xi from left eigen value, xi from right eigen value"+"\n")
+    file_output.write("## T, f=F/N, m=M/N,  f_exact, m_exact, iteration number, correlation length"+"\n")
 
 
 
@@ -178,10 +178,10 @@ def main():
 
     print("## calculate correlation length")
     ## calculate correlation length
-    xi_L, xi_R = Calc_correlation_length(Tn,lam,1)
-    print(repr(T)+" "+ repr(xi_L[0])+" " +repr(xi_R[0]))
+    xi = Calc_correlation_length(Tn,Tn,lam,lam,1)
+    print(repr(T)+" "+ repr(xi[0]))
 
-    file_output.write(repr(T)+" "+ repr(-T*np.log(np.real(eig_L[0] * factor)))+ " " +repr(np.real(mag))+" " +repr(f_ex)+" " +repr(m_ex)+" "+repr(itr)+ " " + repr(xi_L[0])+" " +repr(xi_R[0])+"\n")
+    file_output.write(repr(T)+" "+ repr(-T*np.log(np.real(eig_L[0] * factor)))+ " " +repr(np.real(mag))+" " +repr(f_ex)+" " +repr(m_ex)+" "+repr(itr)+ " " + repr(xi[0])+"\n")
                         
 if __name__ == "__main__":
     main()

@@ -715,40 +715,31 @@ def Calc_2site_2layer(Tn1_U,Tn2_U,Tn1_D,Tn2_D,lam1_U,lam2_U,lam1_D,lam2_D,local_
     
     return np.tensordot(v,vec_R,([0,1,2,3],[0,1,2,3]))
     
-def Calc_correlation_length(Tn,lam,l_num):
+def Calc_correlation_length(Tn_U,Tn_D,lam_U,lam_D,l_num):
     ## We assume uniforma iMPS
     ## Calculate correltion lenght from left and right eigen values
 
-    chi = Tn.shape[0]
-    Tn_L = np.tensordot(np.diag(lam),Tn,(1,0))
-    Tn_R = np.tensordot(Tn,np.diag(lam),(2,0))
+    chi = Tn_U.shape[0]
+    lam_U_sq = np.sqrt(lam_U)
+    lam_D_sq = np.sqrt(lam_D)
+    Tn_U_mod = np.tensordot(np.tensordot(np.diag(lam_U_sq),Tn_U,(1,0)),np.diag(lam_U_sq),(2,0))
+    Tn_D_mod = np.tensordot(np.tensordot(np.diag(lam_D_sq),Tn_D,(1,0)),np.diag(lam_D_sq),(2,0))
 
     if chi**2 > l_num+1:    
         def vL(v):
-            v_new = np.tensordot(np.tensordot(v.reshape(chi,chi),Tn_L,(0,0)),Tn_L.conj(),([0,1],[0,1]))
-            return v_new.reshape(chi**2)
-        def Rv(v):
-            v_new = np.tensordot(np.tensordot(v.reshape(chi,chi),Tn_R,(0,2)),Tn_R.conj(),([0,2],[2,1]))
+            v_new = np.tensordot(np.tensordot(v.reshape(chi,chi),Tn_U_mod,(0,0)),Tn_D_mod,([0,1],[0,1]))
             return v_new.reshape(chi**2)
         
-        T_mat = spr_linalg.LinearOperator((chi**2,chi**2),matvec=Rv)
-
-        eig_val_R,eig_vec = spr_linalg.eigs(T_mat, k=l_num + 1)
-
         T_mat = spr_linalg.LinearOperator((chi**2,chi**2),matvec=vL)
 
         eig_val_L,eig_vec = spr_linalg.eigs(T_mat, k=l_num + 1)
 
     elif chi != 1:
         ## full diagonailzation
-        T_mat = np.tensordot(Tn_R,Tn_R.conj(),(1,1)).transpose(0,2,1,3).reshape(chi**2,chi**2)
-        eig_val_R = linalg.eigvals(T_mat)
-
-        T_mat = np.tensordot(Tn_L,Tn_L.conj(),(1,1)).transpose(0,2,1,3).reshape(chi**2,chi**2)
+        T_mat = np.tensordot(Tn_U_mod,Tn_D_mod,(1,1)).transpose(0,2,1,3).reshape(chi**2,chi**2)
         eig_val_L = linalg.eigvals(T_mat)
 
         ## ordering
-        eig_val_R = eig_val_R[np.argsort(np.abs(eig_val_R))[::-1]]
         eig_val_L = eig_val_L[np.argsort(np.abs(eig_val_L))[::-1]]
 
-    return -1/np.log(np.abs(eig_val_L[1:]/eig_val_L[0])),-1/np.log(np.abs(eig_val_R[1:]/eig_val_R[0]))
+    return -1/np.log(np.abs(eig_val_L[1:]/eig_val_L[0]))
