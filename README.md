@@ -2,7 +2,7 @@
 python implementations of iTEBD for classical square lattice Ising models.
 * Main algorithms
   * iTEBD_classical.py 
-    * Based on R. Orus and G. Vidal Phys. Rev. B 78, 155117 􏰀(2008􏰁). I modified the definition of singualr values in Fig.13 (algorith for 2-site iMPS). (It might be a typo...).
+    * Based on R. Orus and G. Vidal Phys. Rev. B 78, 155117 (2008). I modified the definition of singualr values in Fig.13 (algorith for 2-site iMPS). (It might be a typo...).
 * Square lattice Ising model
   * iTEBD_Ising.py
     * iTEBD with 1-site iMPS. 
